@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           build-args: |
-            PKG_FETCH_OPTION_n="node${{ matrix.target-node }} -b"
+            PKG_FETCH_OPTION_n=node${{ matrix.target-node }} -b
             CFLAGS=-march=x86-64-v3
             CXXFLAGS=-march=x86-64-v3
           context: .
