@@ -19,4 +19,38 @@ jobs:
             platform: amd64
 
     steps:
-      - uses: actions/checkout@v6
+      - name: pkg-fetch
+        uses: actions/checkout@v6
+        with:
+          repository: yao-pkg/pkg-fetch
+          ref: v3.6.3
+      
+      - run: sed "s/--without-npm/--without-npm','--without-amaro','--without-corepack','--without-sqlite','--without-intl/" -i lib/build.ts
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          build-args: |
+            PKG_FETCH_OPTION_n=node${{ matrix.target-node }}
+            CFLAGS=-march=x86-64-v3
+            CXXFLAGS=-march=x86-64-v3
+          context: .
+          file: ./Dockerfile.linux
+          platforms: linux/${{ matrix.arch.platform }}
+          outputs: type=local, dest=dist
+
+      - name: Check if binary is compiled, skip if download only
+        id: check_file
+        run: |
+          ls -l dist
+          (test -f dist/*.sha256sum && echo "EXISTS=true" >> $GITHUB_OUTPUT) || echo "EXISTS=false" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v7
+        if: steps.check_file.outputs.EXISTS == 'true'
+        with:
+          name: node${{ matrix.target-node }}-linux-${{ matrix.arch.name }}
+          path: dist/*
