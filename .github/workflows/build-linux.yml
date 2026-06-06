@@ -27,6 +27,7 @@ jobs:
       
       - run: sed "s/--without-npm/--without-npm','--without-amaro','--without-corepack','--without-sqlite','--without-intl/" -i lib/build.ts
       - run: sed "s/small-icu/none/" -i lib/build.ts
+      - run: sed "s/yarn start/CFLAGS=-march=x86-64-v3 CXXFLAGS=-march=x86-64-v3 yarn start/" -i Dockerfile.linux
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
