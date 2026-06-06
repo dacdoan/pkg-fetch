@@ -1,0 +1,22 @@
+name: Build Node binaries for Linux
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  linux:
+    runs-on: ${{ matrix.arch.os }}
+    name: linux-${{ matrix.arch.name }} (${{ matrix.target-node }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-node: [24]
+        arch:
+          - name: x64
+            os: ubuntu-22.04
+            platform: amd64
+
+    steps:
+      - uses: actions/checkout@v6
